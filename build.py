@@ -1,7 +1,7 @@
 from fontTools.ttLib.ttFont import newTable
 from fontmake import __main__
 from fontTools.ttLib import TTFont, newTable
-import shutil, subprocess, glob
+import shutil, subprocess, glob, sys
 from pathlib import Path
 
 print ("[RocknRoll] Generating TTFs")
@@ -27,18 +27,22 @@ shutil.rmtree("instance_ufo")
 shutil.rmtree("master_ufo")
 shutil.rmtree("master_ttf")
 
-for font in Path("fonts/ttf/").glob("*.ttf"):
-    print ("["+str(font).split("/")[2][:-4]+"] Autohinting")
-    fontName = str(font)
-    hintedName = fontName[:-4]+"-hinted.ttf"
-    subprocess.check_call(
-        [
-            "ttfautohint",
-            "--stem-width",
-            "nsn",
-            fontName,
-            hintedName,
-        ]
-    )
+try:
+    if sys.argv[1] == "--autohinting":
+        for font in Path("fonts/ttf/").glob("*.ttf"):
+            print ("["+str(font).split("/")[2][:-4]+"] Autohinting")
+            fontName = str(font)
+            hintedName = fontName[:-4]+"-hinted.ttf"
+            subprocess.check_call(
+                [
+                    "ttfautohint",
+                    "--stem-width",
+                    "nsn",
+                    fontName,
+                    hintedName,
+                ]
+            )
 
-    shutil.move(hintedName, fontName)
+            shutil.move(hintedName, fontName)
+except IndexError:
+    pass
